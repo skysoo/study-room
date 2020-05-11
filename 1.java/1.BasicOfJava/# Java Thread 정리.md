@@ -35,4 +35,5 @@
 
 
 ### 2.2 Parallelism
-![jvm 구조]()
+
+![Concurrency vs Parallelism](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Concurrency_Parallelism.png)
