@@ -12,7 +12,7 @@
 * reference fileds
     + interface, arrays, etc
 
-![Java 자료형 크기](https://github.com/skysoo/study-basic/tree/master/1.java/99.Img/Java Data Type size.png)
+![Java 자료형 크기](https://github.com/skysoo/study-basic/tree/master/1.java/99.Img/JavaDataTypesize.png)
 
 ## Java variables
 
@@ -29,7 +29,7 @@
 4. class loader가 class파일을 jvm 메모리 영역으로 올린다.
 5. 실행기가 jvm 메모리 영역(run time영역)의 바이트 코드를 해석하며 실행한다.
 
-![jvm 구조](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/JVM Memory Structure.png)
+![jvm 구조](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/JVMMemoryStructure.png)
 
 
 ## 메모리 영역
