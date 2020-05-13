@@ -10,8 +10,8 @@
 	* 종료				TERMINATED
 
 ### 1.2 Thread 구현 방법
-   1. Thread 상속
-      1. start() 메서드 호출 가능
+1. Thread 상속
+   1. start() 메서드 호출 가능
 ~~~java
 ThreadA threadA = new ThreadA(sumB);
 threadA.start();
@@ -42,8 +42,8 @@ class RunnableA implements Runnable {
 }
 ~~~
 
-   1. Runnable 구현한 뒤, Thread 객체 생성
-      1. start() 메서드 호출 불가능, 반드시 Thread 객체에 담아서 사용
+2. Runnable 구현한 뒤, Thread 객체 생성
+    1. start() 메서드 호출 불가능, 반드시 Thread 객체에 담아서 사용
 ~~~java
 RunnableA runnableA = new RunnableA(sumC);
 Thread threadWithRunnable = new Thread(runnableA);
@@ -76,7 +76,8 @@ class ThreadA extends Thread {
 }
 ~~~
 
-	 1. Lambda를 사용하여 runnable 구현
+3. Lambda를 사용하여 runnable 구현
+
 ~~~java
 new Thread(() -> {
 		for (int i = 0; i < 10; i++)
