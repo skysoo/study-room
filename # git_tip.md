@@ -49,7 +49,7 @@ git pull origin master<브랜치>
 
 ### 참조. Git Status
 
-![GitStatus](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/GitStatus.png)
+![GitStatus](./1.java/99.Img/GitStatus.png)
 
 
 # 2. git branch
@@ -105,7 +105,7 @@ git push origin master
 
 > git reset의 대상 트리는 HEAD, Index, Working Directory 3가지이다.
 
-![Git Tree](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/GitTree.png)
+![Git Tree](./1.java/99.Img/GitTree.png)
 
 ### 4.1 soft reset
 * soft reset은 HEAD 트리의 브랜치를 지정한 커밋 버전으로 이동 시킨다.
@@ -257,43 +257,43 @@ git flow release finish <branch name>
 
 ### 9.1 git issue 등록
 
-![gitflow1](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow1.png)
+![gitflow1](./1.java/99.Img/Gitflow1.png)
 
 ### 9.2 ide task 작성 or gitflow feature start
-![gitflow2](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow2.png)
+![gitflow2](./1.java/99.Img/Gitflow2.png)
 
 ### 9.3 추가 기능 or 변경 사항 commit
 
-![gitflow3](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow3.png)
+![gitflow3](./1.java/99.Img/Gitflow3.png)
 
-![gitflow3-1](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow3-1.png)
+![gitflow3-1](./1.java/99.Img/Gitflow3-1.png)
 
 ### 9.4 gitflow feature finish
-![gitflow4-1](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow4-1.png)
+![gitflow4-1](./1.java/99.Img/Gitflow4-1.png)
 
-![gitflow4](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow4.png)
+![gitflow4](./1.java/99.Img/Gitflow4.png)
 
 ### 9.5 gitflow release start
 
-![gitflow5](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow5.png)
+![gitflow5](./1.java/99.Img/Gitflow5.png)
 
-![gitflow5-1](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow5-1.png)
+![gitflow5-1](./1.java/99.Img/Gitflow5-1.png)
 
 ### 9.6 Local release branch push to Remote
 
-![gitflow6](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow6.png)
+![gitflow6](./1.java/99.Img/Gitflow6.png)
 
 ### 9.7 release branch merge to master
 
-![gitflow7](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow7.png)
+![gitflow7](./1.java/99.Img/Gitflow7.png)
 
 ### 9.8 release branch delete
 
-![gitflow8](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow8.png)
+![gitflow8](./1.java/99.Img/Gitflow8.png)
 
 ### 9.9 Pull From Remote master To Local master
 
-![gitflow9](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Gitflow9.png)
+![gitflow9](./1.java/99.Img/Gitflow9.png)
 
 
 # git error solution
