@@ -14,7 +14,7 @@
 	* 지역변수, 매개변수, 리턴값, 참조변수(주소값) 등이 저장됨
 	* 메서드 호출 때 메모리에 filo로 하나씩 생성
 
-![jvm 구조](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/JVMStructureJava8.png)
+![jvm 구조](../99.Img/JVMStructureJava8.png)
 
 Java7 이전에는 Permanent 영역이 존재했었지만 Java8 부터 해당 영역은 사라졌고 Permanet 영역에 저장되었던 아래 내용들은 Metaspace 영역에 저장된다.
 
@@ -23,7 +23,7 @@ Java7 이전에는 Permanent 영역이 존재했었지만 Java8 부터 해당 �
 * Names of the classes -> Native
 * Static variables -> Heap
 
-![메모리 구조 변경사항](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/JVMJava8.png)
+![메모리 구조 변경사항](../99.Img/JVMJava8.png)
 
 Java7 이전에는 new로 선언된 String만 Heap 영역에 저장되었고 literal로 선언된 String은 String Constant Pool 에 저장되었으며(Perm영역) GC의 대상이 아니었지만 
 
@@ -59,7 +59,7 @@ Java7 이전에는 new로 선언된 String만 Heap 영역에 저장되었고 lit
 * reference fileds (참조형 데이터) - 힙 영역
     + interface, arrays, etc
 
-![Java 자료형 크기](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/JavaDataTypesize.png)
+![Java 자료형 크기](../99.Img/JavaDataTypesize.png)
 
 
 # 2. GC(Garbage Collection) 구조
@@ -84,7 +84,7 @@ url 변수는 main() 함수 안에 선언되었으므로 지역 변수로써 Sta
 ~~~java
 String url = "https://";
 ~~~
-![Memory 할당1](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/MemoryAllocation1.png)
+![Memory 할당1](../99.Img/MemoryAllocation1.png)
 
 
 또한 url 에 붙여진 문자열은 기존 데이터가 아닌 새롭게 Heap 영역에 할당 될 것이다.
@@ -92,12 +92,12 @@ String url = "https://";
 ~~~java
 url += "skysoo1111.github.io";
 ~~~
-![Memory 할당2](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/MemoryAllocation2.png)
+![Memory 할당2](../99.Img/MemoryAllocation2.png)
 
 
 그로인해 이전 참조값이었던 String https:// 는 더이상 사용되지 않는 데이터가 되었다. 이를 Stack 영역에서 도달 불가능한 값이라 하여 Unreachable 오브젝트라고 한다.
 
-![Memory 할당3](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/MemoryAllocation3.png)
+![Memory 할당3](../99.Img/MemoryAllocation3.png)
 
 
 이렇게 발생하는 Unreachable 데이터들은 GC 대상이 된다.
@@ -105,7 +105,7 @@ url += "skysoo1111.github.io";
 
 ### 2.2 GC 과정
 
-![GC](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/GCSpaceJava8.png)
+![GC](../99.Img/GCSpaceJava8.png)
 
 Java8에서 메모리 관련하여 가장 두드러진 변화는 Heap영역에서 Permanent Generation 이 사라지고 이를 Native Memory 영역의 Metaspace가 대체한 것이다.
 

@@ -137,7 +137,7 @@ JAVA 1.0 이후
 
 > 즉 Concurrency 와 Parallelism 은 의존 관계가 아니며 명백히 다른 의미를 지니고 있다. 둘의 단순 성능 비교는 의미가 없다. 따라서 구성하려는 시스템의 성향에 따라 적절하게 사용하면 된다.
 
-![Concurrency vs Parallelism](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Concurrency_Parallelism.png)
+![Concurrency vs Parallelism](../99.Img/Concurrency_Parallelism.png)
 
 
 > 참조 <https://vallista.kr/2019/12/28/%EB%8F%99%EC%8B%9C%EC%84%B1%EA%B3%BC-%EB%B3%91%EB%A0%AC%EC%84%B1-Concurrency-Parallelism/>

@@ -87,7 +87,7 @@ Java 7부터 지원된 기능으로 Fork Join Framework의 대표적인 클래�
 
 핵심 기술은 work-stealling 이라는 기술이다. 이것은 유휴 상태의 쓰레드를 없애는 방식인데, 세부 동작은 아래와 같다.
 
-![ForkJoinPool img](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/ForkJoinPool.png)
+![ForkJoinPool img](../99.Img/ForkJoinPool.png)
 
 만약 위 그림처럼 B 쓰레드가 모든 일을 다 처리해서 더이상 할일이 없는 경우, CPU자원이 놀게 된다(Idle).
 이런 상황에서 work-stealling이 동작하게 되면 A 쓰레드 큐에 남은 Task를 B에서 가져와서 처리를 하는 식으로 구현을 해주면 CPU가 놀지않고 최적의 성능을 낼 수 있다.
