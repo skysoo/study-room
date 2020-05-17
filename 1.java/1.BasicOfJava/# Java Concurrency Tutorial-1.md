@@ -151,21 +151,22 @@ synchronized (lock) {
 ~~~
 
 
-AtomicLong vs volatile vs synchronized(Long)
+AtomicLong vs synchronized(object)
 
 ![JavaMemory](../99.Img/JavaMemory.png)
 
 1. Atomic 클래스는 CAS(Compare-and-swap) 방식으로 동작한다.
    * 비교하고 다르면 다시 읽고 비교하고 이를 반복한다.
 
-2. volatile은 가시성 문제를 해결한다. 
-   * volatile을 사용하면 해당 변수는 모든 읽기, 쓰기 연산을 메인 메모리에서만 처리하다.
-
-3. synchronized(object)
+2. synchronized(object)
    * 하나의 스레드가 lock을 얻고 나서 작업이 끝날 때까지 다른 스레드들은 대기한다. 
 
+> synchronized 보다 Atomic 클래스 객체를 사용하는 것이 성능이나 비용면에서 유리하다.
 
 ## 5.4 Guarding State with Locks
 
 
 ## 5.5 Liveness and Performance
+
+
+> 참조 <http://tutorials.jenkov.com/java-concurrency/index.html>

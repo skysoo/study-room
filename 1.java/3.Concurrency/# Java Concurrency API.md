@@ -1,4 +1,3 @@
-# SPRING CONCURRENCY DEMO
 
 [1. Low Level Concurrency](#1-low-level-concurrency)
 
@@ -11,6 +10,29 @@
 [2.3 Java8 - CompletableFuture](#23-java8---completablefuture)
 
 [2.4 Java8 - WorkStealingPool](#24-java8---workstealingpool)
+
+# 동기 / 비동기 / 블락 / 논블락 정리
+
+1. 동기 / 비동기 
+  * 주체 : Thread
+  * 관점 : 시간
+
+  > 요청과 결과가 동시에 일어나는 것을 의미한다. Thread 의 입장에서 요청한 작업의 결과를 기다리면 동기, 기다리지 않으면 비동기  
+
+  > 결과물을 돌려받는 시점이 중요. 요청 후 작업이 끝날때까지 기다린 뒤, 결과물을 가져오면 동기
+
+2. 블락 / 논블락 
+  * 주체 : Thread
+  * 관점 : 행위
+
+  > Thread 의 입장에서 자신에게 할당된 작업을 끝낸 뒤, 다른 스레드들의 전체 작업이 끝날 때까지 기다린다면 블락, 기다리지 않고 할 일을 한다면 논블락
+
+* Future 예제
+  * Main Thread 입장 - 비동기 / 논블락
+  * Exeuctor Thread 입장 - 동기 / 블락
+
+  > get()은 결과 처리가 완료될 때까지 블락킹된다.
+
 
 # 1. Low Level Concurrency
 1. Synchronized
