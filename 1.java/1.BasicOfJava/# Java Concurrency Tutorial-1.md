@@ -11,11 +11,11 @@ Java Concurrency Tutorial에서는 멀티스레딩, 동시성 구성, 동시성 
 
 스레드는 응용 프로그램을 실행하는 별도의 CPU와 같다. 따라서 다중 스레드 응용 프로그램은 여러 CPU가 동시에 코드의 다른 부분을 실행하는 응용 프로그램과 같다.
 
-![Thread1](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Thread1.png)
+![Thread1](https://github.com/skysoo/study-basic/blob/master/99.img/Thread1.png)
 
 단, 스레드는 CPU와 같지는 않다. 일반적으로 단일 CPU는 여러 스레드간에 실행 시간을 공유하여 지정된 시간동안 각 스레드 간에 전환이 일어나며, 응용 프로그램의 스레드가 다른 CPU에 의해 실행되도록 할 수 있다.
 
-![Thread2](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/Thread2.png)
+![Thread2](https://github.com/skysoo/study-basic/blob/master/99.img/Thread2.png)
 
 
 # 2. Why Multithreading?
@@ -153,7 +153,7 @@ synchronized (lock) {
 
 AtomicLong vs volatile vs synchronized(Long)
 
-![JavaMemory](https://github.com/skysoo/study-basic/blob/master/1.java/99.Img/JavaMemory.png)
+![JavaMemory](https://github.com/skysoo/study-basic/blob/master/99.img/JavaMemory.png)
 
 1. Atomic 클래스는 CAS(Compare-and-swap) 방식으로 동작한다.
    * 비교하고 다르면 다시 읽고 비교하고 이를 반복한다.
