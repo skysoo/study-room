@@ -60,7 +60,7 @@ Java Concurrency Tutorial에서는 멀티스레딩, 동시성 구성, 동시성 
 스레드의 생존을 위협하는 많은 경우가 존재하는데 예를 들면 스레드 B가 독점적인 자원을 스레드 A가 대기하고 있을 때, 스레드 B가 자원을 절대 해제하지 않는다면 스레드 A는 영원히 대기해야 한다. 이 때, 프로그램은 deadlock, starvation, livelock 등의 문제가 발생하게 된다.
 
 ## 4.3 Performances Hazards
-성능 문제는 짧은 서비스 시간, 응답성, 처리량, 리소스 소비 또는 확정성 등 광범위한 문제를 다룬다. 응용 프로그램에서 잘 설계된 스레드를 사용한다면 성능 향상을 가져올 것이다. 그렇지 않다면 context-swiching에서 발생하는 비용(CPU 사용량)이 더 많이 들 수 있다. 
+성능 문제는 짧은 서비스 시간, 응답성, 처리량, 리소스 소비 또는 확정성 등 광범위한 문제를 다룬다. 응용 프로그램에서 잘 설계된 스레드를 사용한다면 성능 향상을 가져올 것이다. 그렇지 않다면 context-swiching에서 발생하는 비용(CPU 사용량)이 더 많이 들 수 있다.
 
 # 5. Thread Safety
 
@@ -79,14 +79,14 @@ Thread-safety를 정의할 수 있는 가장 가까운 단어는 정확성이다
 > Thread-safe 클래스는 필요한 동기화를 캡슐화하여 클라이언트가 자체적으로 제공할 필요가 없다.
 
 ~~~java
-@ThreadSafe 
-public class StatelessFactorizer implements Servlet {     
-   public void service(ServletRequest req, ServletResponse resp) 
-   {         
-      BigInteger i = extractFromRequest(req);         
-      BigInteger[] factors = factor(i);         
-      encodeIntoResponse(resp, factors);     
-   } 
+@ThreadSafe
+public class StatelessFactorizer implements Servlet {
+   public void service(ServletRequest req, ServletResponse resp)
+   {
+      BigInteger i = extractFromRequest(req);
+      BigInteger[] factors = factor(i);
+      encodeIntoResponse(resp, factors);
+   }
 }
 ~~~
 
@@ -96,37 +96,37 @@ public class StatelessFactorizer implements Servlet {
 ## 5.2 Atomicty
 
 ~~~java
-@NotThreadSafe 
+@NotThreadSafe
 public class UnsafeCountingFactorizer implements Servlet {
-        private long count = 0;     
-        public long getCount() { 
-           return count; 
-         }     
+        private long count = 0;
+        public long getCount() {
+           return count;
+         }
 
-         public void service(ServletRequest req, ServletResponse resp) {         
-            BigInteger i = extractFromRequest(req);         
-            BigInteger[] factors = factor(i);         
-            ++count;         
-            encodeIntoResponse(resp, factors);     
-         } 
+         public void service(ServletRequest req, ServletResponse resp) {
+            BigInteger i = extractFromRequest(req);
+            BigInteger[] factors = factor(i);
+            ++count;
+            encodeIntoResponse(resp, factors);
+         }
 }
 ~~~
 
 > 가능한 경우 AtomicLong과 같은 기존 스레드로부터 안전한 객체를 사용하여 클래스 상태를 관리해라.
 
 ~~~java
-@ThreadSafe 
-public class CountingFactorizer implements Servlet { 
-      private final AtomicLong count = new AtomicLong(0);     
-      public long getCount() { 
-         return count.get(); 
-      }     
-      public void service(ServletRequest req, ServletResponse resp) {         
-         BigInteger i = extractFromRequest(req);         
-         BigInteger[] factors = factor(i);         
-         count.incrementAndGet();         
-         encodeIntoResponse(resp, factors);     
-      } 
+@ThreadSafe
+public class CountingFactorizer implements Servlet {
+      private final AtomicLong count = new AtomicLong(0);
+      public long getCount() {
+         return count.get();
+      }
+      public void service(ServletRequest req, ServletResponse resp) {
+         BigInteger i = extractFromRequest(req);
+         BigInteger[] factors = factor(i);
+         count.incrementAndGet();
+         encodeIntoResponse(resp, factors);
+      }
 }
 ~~~
 
@@ -145,8 +145,8 @@ Java는 원자성을 강화하기 위해 잠금 메커니즘인 동기화된 블
    * 동일한 스레드가 다시 잠금을 획득하면 카운트가 증가하고 소유 스레드가 동기화된 블록을 종료할 때 카운트가 감소한다. 카운트가 0이 될 때 최종적으로 잠금이 해제된다.
 
 ~~~java
-synchronized (lock) {     
-   // Access or modify shared state guarded by lock 
+synchronized (lock) {
+   // Access or modify shared state guarded by lock
 }
 ~~~
 
@@ -159,7 +159,7 @@ AtomicLong vs synchronized(object)
    * 비교하고 다르면 다시 읽고 비교하고 이를 반복한다.
 
 2. synchronized(object)
-   * 하나의 스레드가 lock을 얻고 나서 작업이 끝날 때까지 다른 스레드들은 대기한다. 
+   * 하나의 스레드가 lock을 얻고 나서 작업이 끝날 때까지 다른 스레드들은 대기한다.
 
 > synchronized 보다 Atomic 클래스 객체를 사용하는 것이 성능이나 비용면에서 유리하다.
 

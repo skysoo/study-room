@@ -25,7 +25,7 @@ Java7 이전에는 Permanent 영역이 존재했었지만 Java8 부터 해당 �
 
 ![메모리 구조 변경사항](../99.Img/JVMJava8.png)
 
-Java7 이전에는 new로 선언된 String만 Heap 영역에 저장되었고 literal로 선언된 String은 String Constant Pool 에 저장되었으며(Perm영역) GC의 대상이 아니었지만 
+Java7 이전에는 new로 선언된 String만 Heap 영역에 저장되었고 literal로 선언된 String은 String Constant Pool 에 저장되었으며(Perm영역) GC의 대상이 아니었지만
 
 > Java8 부터 Constant Pool의 저장 영역이 Heap으로 바뀌면서 literal로 선언된 String 역시 GC 대상이 된다.
 
