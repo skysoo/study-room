@@ -329,7 +329,7 @@ public Map<String, Date> lastLogin =
 
 > Immutable 객체를 사용하자.
 
-> 객체에 대한 참조와 상태가 모든 스레드에서 동시에 표시되도록 하자.
+> 객체에 대한 참조 상태가 모든 스레드에서 동시에 표시되도록 하자.
 
 > 가능하면 모든 변수는 private, final로 선언해라.
 
