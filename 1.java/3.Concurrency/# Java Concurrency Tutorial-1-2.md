@@ -1,4 +1,4 @@
-# Java Concurrency
+# Java Concurrency Tutorial 1-2
 
 Java Concurrency는 Java 플랫폼에서의 멀티스레딩, 동시성 및 병렬 처리를 다루는 용어이다.
 

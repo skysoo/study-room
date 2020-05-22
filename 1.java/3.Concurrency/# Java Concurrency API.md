@@ -1,14 +1,9 @@
 
 [1. Low Level Concurrency](#1-low-level-concurrency)
-
 [2. High Level Concurrency](#2-high-level-concurrency)
-
 [2.1 Java5 - ExecutorService](#21-java5---executorservice)
-
 [2.2 Java7 - ForkJoinPool](#22-java7---forkjoinpool)
-
 [2.3 Java8 - CompletableFuture](#23-java8---completablefuture)
-
 [2.4 Java8 - WorkStealingPool](#24-java8---workstealingpool)
 
 # 동기 / 비동기 / 블락 / 논블락 정리
