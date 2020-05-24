@@ -1,27 +1,22 @@
 
 [1. Low Level Concurrency](#1-low-level-concurrency)
-
 [2. High Level Concurrency](#2-high-level-concurrency)
-
 [2.1 Java5 - ExecutorService](#21-java5---executorservice)
-
 [2.2 Java7 - ForkJoinPool](#22-java7---forkjoinpool)
-
 [2.3 Java8 - CompletableFuture](#23-java8---completablefuture)
-
 [2.4 Java8 - WorkStealingPool](#24-java8---workstealingpool)
 
 # 동기 / 비동기 / 블락 / 논블락 정리
 
-1. 동기 / 비동기 
+1. 동기 / 비동기
   * 주체 : Thread
   * 관점 : 시간
 
-  > 요청과 결과가 동시에 일어나는 것을 의미한다. Thread 의 입장에서 요청한 작업의 결과를 기다리면 동기, 기다리지 않으면 비동기  
+  > 요청과 결과가 동시에 일어나는 것을 의미한다. Thread 의 입장에서 요청한 작업의 결과를 기다리면 동기, 기다리지 않으면 비동기
 
   > 결과물을 돌려받는 시점이 중요. 요청 후 작업이 끝날때까지 기다린 뒤, 결과물을 가져오면 동기
 
-2. 블락 / 논블락 
+2. 블락 / 논블락
   * 주체 : Thread
   * 관점 : 행위
 
