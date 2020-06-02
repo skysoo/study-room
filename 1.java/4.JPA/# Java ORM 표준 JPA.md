@@ -294,9 +294,565 @@ public void setTeam(Team team) {
     => 실무에서는 사용하면 안된다.
 
 
+# 6. 고급 매핑
+
+## 6.1 상속 관계 매핑
+기본적으로 관계형 DB에서는 상속 관계가 없다.
+
+대신 슈퍼 타입 - 서브 타입 이라는 모델링 기법이 상속 개념과 유사
+
+* 슈퍼타입-서브타입 논리 모델을 물리 모델로 구현하는 방법
+  * 각각 테이블로 변환 -> 조인 전략 (굉장히 정규화된 방식)
+  * 통합 테이블로 변환 -> 단일 테이블 전략 (심플, 성능)
+  * 서브타입 테이블로 변환 -> 구현 클래스마드 테이블 전략 (중복 발생)
+
+* @Inheritance(strategy = InheritanceType.JOINED)
+    * 각 서브 테이블이 다 생성된다.
+    * 명시적이라는 장점이다(정규화)
+    * 외래키 참조 무결성 제약 조건 사용 가능
+    * 조회시 조인을 많이 사용하는 편, 성능 저하 가능성 -> 큰 단점은 아니라고 생각
+
+![JPA1](../99.Img/JPA1.png)
+
+* @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+   * 성능이 좋다.
+   * 슈퍼테이블만 생성된다.
+   * 서브테이블 값만 들어가고 나머지 필드는 null로 들어간다. (자식 컬럼 모두 null 허용되어야 한다)
+   * Join 필요도 없고 쿼리도 한번만 나간다.
+   * @DiscriminatorColumn 필수다. 한 테이블에 다 때려박기 때문에 구분자가 필수이다.
+
+![JPA2](../99.Img/JPA2.png)
+
+* @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+    * 슈퍼테이블은 만들지 않는다.
+    * 서브테이블에 슈퍼테이블의 컬럼을 중복해서 다 넣는다.
+    * 성능이 안좋다. 조회시 union으로 모든 테이블을 다 뒤진다.
+
+![JPA3](../99.Img/JPA3.png)
+
+
+* @DiscriminatorColumn(name= "`DTYPE`") - 대상은 슈퍼 테이블
+상속 관계에서 해당 컬럼까지 넣어주면 dtype 이 생기고 서브 테이블이 어떤건지 같이 Insert 된다.
+
+* @DiscriminatorValue("M") - 대상은 서브 테이블
+슈퍼 테이블의 DTYPE 테이블에 들어갈 값을 지정할 수 있다. 이 어노테이션이 없으면 테이블명이 기본으로 들어간다.
+
+
+> 상속 관계 전략을 바꾸더라고 코드를 손댈것이 별로 없다. -> 어노테이션만 손대면 된다.
+
+
+## 상속 관계 정리
+1. 슈퍼 테이블은 abstract로 선언한다. - 단, 슈퍼클래스만 따로 정의할 일이 없다고 판단했을 경우
+2. @DiscriminatorColumn 어노테이션은 필수이다. - DTYPE
+3. TABLE_PER_CLASS, 구현 클래스마다 테이블 전략, 현업에서 쓰면 안되는 방법!
+
+
+Everywhere
+
+## 6.2 Mapped super class,
+
+@MappedSuperclass
+
+상속 관계 매핑없이 상위 테이블의 값을 쓰고 싶을 때
+
+* 이것으로 정의된것은 엔티티 X, 테이블과 매핑 X
+* 조회, 검색 불가
+* 직접 생성해서 사용할 일 없으므로 추상클래스로 사용해라.
+* 단순히 엔티티가 공통으로 사용하는 매핑 정보를 모으는 역할
+
+
+# 7. 프록시와 연관관계 관리
+
+* 참조된 모든 객체를 다 조회해야할 필요가 있나? - 불필요한 성능 저하 유발
+  * 참조된 객체들 중 내가 조회하고 싶은 특정 객체만 조회하는것을 JPA는 지원한다.
+
+## 7.1 프록시
+
+~~~java
+// find()는 실행 시점에서 쿼리가 나감(실제 조회값)
+Teamone findMember = entityManager.find(Teamone.class, teamone.getId());
+
+// getReference()는 조회를 미루는 가짜(프록시) 객체 조회
+Teamone findMember = entityManager.getReference(Teamone.class, teamone.getId());
+~~~
+
+![JPA4](../99.Img/JPA4.png)
+
+![JPA5](../99.Img/JPA5.png)
+
+![JPA6](../99.Img/JPA6.png)
+
+![JPA7](../99.Img/JPA7.png)
+
+~~~java
+Teamone teamone1 = entityManager.find(Teamone.class, teamone.getId());
+Teamone teamone3 = entityManager.find(Teamone.class, teamone2.getId());
+
+System.out.println("t1 == t2 " + (teamone1.getClass() == teamone3.getClass()));
+
+> true
+~~~
+
+
+~~~java
+Teamone teamone1 = entityManager.find(Teamone.class, teamone.getId());
+Teamone teamone3 = entityManager.getReference(Teamone.class, teamone2.getId());
+
+System.out.println("t1 == t2 " + (teamone1.getClass() == teamone3.getClass()));
+
+> false
+
+// == 비교가 아니라 instanceof 를 사용해야 한다.
+System.out.println("t1 == t2 " + (teamone1 instanceof Teamone));
+System.out.println("t1 == t2 " + (teamone3 instanceof Teamone));
+~~~
+
+* getReference()를 호출하더라도 이미 영속성 컨텍스트에 있는 내용은 프록시가 아닌 실제 엔티티를 반환한다.
+~~~java
+Teamone find = entityManager.find(Teamone.class, teamone.getId());
+System.out.println("t1 : "+find.getClass());
+
+Teamone reference = entityManager.getReference(Teamone.class, teamone.getId());
+System.out.println("t1 reference : "+reference.getClass());
+
+System.out.println("a == a : "+ (find == reference));
+
+> true
+~~~
+
+* 같은 프록시 반환
+~~~java
+Teamone find = entityManager.getReference(Teamone.class, teamone.getId());
+System.out.println("t1 : "+find.getClass());
+
+Teamone reference = entityManager.getReference(Teamone.class, teamone.getId());
+System.out.println("t1 reference : "+reference.getClass());
+
+System.out.println("a == a : "+ (find == reference));
+
+> true
+
+
+Teamone reference = entityManager.getReference(Teamone.class, teamone.getId());
+System.out.println("t1 : "+reference.getClass());
+
+Teamone find = entityManager.find(Teamone.class, teamone.getId());
+System.out.println("t1 reference : "+find.getClass());
+
+System.out.println("a == a : "+ (find == reference));
+
+> true
+~~~
+
+> JPA에서는 실제 엔티티든 프록시든 같은 값을 가져오면 같은 객체로 본다.
+1. 실제 엔티티에서 값을 먼저 꺼내고, 프록시에서 같은 값을 꺼내도 둘 다 타입은 엔티티
+2. 프록시에서 값을 먼저 꺼내고, 실제 엔티티에서 같은 값을 꺼내도 둘 다 타입은 프록시
+
+~~~java
+// 초기화 여부 확인
+System.out.println("isLoaded : "+ persistenceUnitUtil.isLoaded(reference));
+
+// 강제 초기화 (참고로 JPA는 강제 초기화 표준 지원 안함)
+Hibernate.initialize(reference);
+~~~
+
+> 결론 - Reference를 많이 사용하진 않지만 이걸 알아야 즉시 로딩과 지연 로딩에 대해 이해하기 쉽다.
+
+
+## 7.2 즉시 로딩과 지연 로딩
+
+* 지연 로딩
+~~~java
+// 지연 로딩
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "team_id")
+private Team team;
+~~~
+
+  * 지연로딩으로 설정된 엔티티 객체는 처음에 프록시로 가져온다.
+  * 그리고 프록시 내 다른 값이 필요한 경우(프록시 초기화가 진행된다)
+
+![JPA8](../99.Img/JPA8.png)
+
+
+* 즉시 로딩
+~~~java
+// 즉시 로딩
+@ManyToOne(fetch = FetchType.EAGER)
+@JoinColumn(name = "team_id")
+private Team team;
+~~~
+
+  * 프록시가 아닌 실제 엔티티 객체를 가져온다.
+  * 초기화가 진행되지도 않음
+
+![JPA9](../99.Img/JPA9.png)
+
+![JPA10](../99.Img/JPA10.png)
+
+> 실무에서는 즉시 로딩을 쓰면 안된다!
+
+> 기본적으로 연관 관계는 지연 로딩으로 셋팅해놓고, 한번에 여러 엔티티를 가져와야하는게 있다면 fetch join을 사용해라.
+
+
+## 7.3 영속성 전이(CASCADE) 와 고아 객체
+
+* 영속성 전이(CASCADE)
+엔티티 객체마다 persist를 해주고 싶지 않고, 특정 엔티티를 중심으로 개발하고 싶을 때, 해당 테이블만 persist 해줘도 된다.
+
+~~~java
+@OneToMany(mappedBy = "parent",cascade = CascadeType.PERSIST)
+private List<Child> childList = new ArrayList<>();
+~~~
+
+![JPA11](../99.Img/JPA11.png)
+
+![JPA12](../99.Img/JPA12.png)
+
+![JPA13](../99.Img/JPA13.png)
+
+> 실제 사용할 때는 ALL or PERSIST에 사용해라.
+
+* 정리
+> 언제 쓰냐? - CASCADE 를 사용하는 곳은 하위 테이블의 관리를 상위 테이블에서만 관리할 때 (소유자가 하나일 때)
+
+
+
+* 고아 객체
+
+* orphanRemoval=true 옵션은 CascadeType.DELETE 와 같은 동작을 한다.
+~~~java
+@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+private List<Child> childList = new ArrayList<>();
+
+@OneToMany(mappedBy = "parent", orphanRemoval = true)
+private List<Child> childList = new ArrayList<>();
+~~~
+
+![JPA14](../99.Img/JPA14.png)
+
+![JPA15](../99.Img/JPA15.png)
+
+![JPA16](../99.Img/JPA16.png)
+
+
+
+# 8. 값 타입
+
+## 8.1 기본값 타입
+
+* 엔티티 타입
+  * @Entity로 정의하는 객체
+  * 데이터가 변해도 식별자로 지속해서 추적 가능
+  * 예) 회원 엔티티의 키나 나이 값을 변경해도 식별자로 인식 가능
+
+* 값 타입
+  * int, Integer, String 처럼 단순히 값으로 사용하는 자바 기본 타입이나 객체
+  * 식별자가 없고 값만 있으므로 변경시 추적 불가
+  * 예) 숫자 100을 200으로 변경하면 완전히 다른 값으로 대체
+
+  1. 기본값 타입
+    * 생명 주기를 엔티티에 의존
+      * 회원을 삭제하면 이름, 나이 필드도 같이 삭제 됨
+    * 값 타입은 공유하면 안된다. 절대로
+
+       1. 자바 기본 타입(int, double)
+       2. 래퍼 클래스(Integer, Long)
+       3. String
+
+   ~~~java
+   // 기본 타입은 항상 값을 복사함
+    public class ValueMain {
+      public static void main(String[] args) {
+          int a = 10;
+          int b = a;
+
+          b = 20;
+
+          System.out.println("a = " + a);
+          System.out.println("b = " + b);
+      }
+    }
+   ~~~
+
+## 8.2 임베디드 타입(복합 값 타입)
+  * 새로운 값 타입을 직접 정의할 수 있음
+  * JPA는 임베디드 타입이라고함
+  * 주로 기본값 타입을 모아서 복합 값이라고도 함
+  * int, String 같은 값타입 (변경하면 끝, 추적 안됨)
+
+  * 장점
+    * 재사용
+    * 높은 응집도-> 임베디드 클래스의 내용만으로 필요한 메서드를 추가하거나 활용도가 높아진다.
+    * Period,isWork() 처럼 해당 값 타입만 사용하는 의미있는 메소드를 만들 수 있다.
+    * 임베디드 타입을 포함한 모든 값 타입은 값 타입을 소유한 엔티티에 생명주기를 의존한다.
+
+![JPA17](../99.Img/JPA17.png)
+
+* 임베디드 값타입 사용 방법
+~~~java
+//address
+@Embedded
+private Address address;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@Embeddable
+public class Address {
+    private String city;
+    private String street;
+    private String zipcode;
+}
+~~~
+
+![JPA18](../99.Img/JPA18.png)
+
+* 엔티티가 임베디드 타입을 가지는 것은 당연히 가능하다.
+* 또한 임베디드 타입이 엔티티를 가질수가 있다.
+
+![JPA19](../99.Img/JPA19.png)
+
+
+* 한 엔티티에서 같은 임베디드 값타입을 사용한다면?
+
+![JPA20](../99.Img/JPA20.png)
+~~~java
+@Embedded
+@AttributeOverrides({
+        @AttributeOverride(name="city",
+                column=@Column(name="HOME_CITY")),
+        @AttributeOverride(name="street",
+                column=@Column(name="HOME_STREET")),
+        @AttributeOverride(name="zipcode",
+                column=@Column(name="HOME_ZIPCODE"))
+})
+private Address homeAddress;
+
+@Embedded
+@AttributeOverrides({
+        @AttributeOverride(name="city",
+                column=@Column(name="WORK_CITY")),
+        @AttributeOverride(name="street",
+                column=@Column(name="WORK_STREET")),
+        @AttributeOverride(name="zipcode",
+                column=@Column(name="WORK_ZIPCODE"))
+})
+private Address workAddress;
+~~~
+
+
+## 8.3 값 타입과 불변 객체
+
+* 값 타입은 복잡한 객체 세상을 조금이라도 단순화 하려고 만든 개념이다. 따라서 값 타입은 단순하고 안전하게 다룰 수 있어야 한다.
+
+~~~java
+// 같은 address 객체를 두 엔티티에 저장할 때 아무 이상 없다.
+Address address = new Address("Busan","Seogu","05008");
+
+Member member1 = new Member();
+member1.setName("member");
+member1.setHomeAddress(address);
+member1.setPeriod(new Period(LocalDateTime.now().minusMinutes(10),LocalDateTime.now()));
+entityManager.persist(member1);
+
+Member member2 = new Member();
+member2.setName("member");
+member2.setHomeAddress(address);
+member2.setPeriod(new Period(LocalDateTime.now().minusMinutes(10),LocalDateTime.now()));
+entityManager.persist(member2);
+
+// 하지만 공유된 객체의 값을 바꾸면?
+member1.getHomeAddress().setCity("Seoul");
+
+> member1 엔티티의 임베디드 객체 값만 바꿨는데,
+> member2 엔티티의 임베디드 객체 값도 같이 바뀌는 문제 발생
+~~~
+
+* 항상 값을 복사해서 사용해라. - 공유 참조로 인한 부작용은 피할 수 있다.
+~~~java
+Address address = new Address("Busan","Seogu","05008");
+
+Member member1 = new Member();
+member1.setName("member");
+member1.setHomeAddress(address);
+member1.setPeriod(new Period(LocalDateTime.now().minusMinutes(10),LocalDateTime.now()));
+entityManager.persist(member1);
+
+// 기존 임베디드 객체를 복사해서 사용해라.
+Address address1 = new Address(address.getCity(),address.getStreet(),address.getZipcode());
+
+Member member2 = new Member();
+member2.setName("member");
+member2.setHomeAddress(address1);
+member2.setPeriod(new Period(LocalDateTime.now().minusMinutes(10),LocalDateTime.now()));
+entityManager.persist(member2);
+
+member1.getHomeAddress().setCity("Seoul");
+
+> 이렇게 사용해야 한다.
+~~~
+
+* 객체의 공유 참조는 피할 수 없다.
+
+![JPA21](../99.Img/JPA21.png)
+![JPA22](../99.Img/JPA22.png)
+
+* 해결 방법 - 불변 객체로 만든다 -> 부작용을 원천 차단하라.
+
+~~~java
+@ThreadSafe
+@Getter
+@NoArgsConstructor(force = true)
+@Embeddable
+public final class Address {
+    private final String city;
+    private final String street;
+    private final String zipcode;
+
+    private Address(AddressBuilder builder){
+        this.city = builder.city;
+        this.street = builder.street;
+        this.zipcode = builder.zipcode;
+    }
+
+    public static class AddressBuilder {
+        private final String city;
+        private final String street;
+        private final String zipcode;
+
+        public AddressBuilder(String city, String street, String zipcode) {
+            this.city = city;
+            this.street = street;
+            this.zipcode = zipcode;
+        }
+
+        public Address build(){
+            return new Address(this);
+        }
+    }
+}
+
+
+
+// Client
+Address address = new Address.AddressBuilder
+                    ("Busan","Seo-Gu","05008")
+                    .build();
+~~~
+
+![JPA23](../99.Img/JPA23.png)
+
+~~~java
+// 깂을 통으로 갈아 끼워라.
+Address address1 = new Address("Seoul",address.getStreet(),address.getZipcode());
+member1.setHomeAddress(address1);
+~~~
+
+## 8.4 값 타입의 비교
+
+![JPA24](../99.Img/JPA24.png)
+
+~~~java
+// 값 비교
+int a = 10;
+int b = 10;
+System.out.println(a==b);
+
+
+// 객체 비교
+Address addressA = new Address.AddressBuilder
+        ("Busan","Seo-Gu","05008")
+        .build();
+Address addressB = new Address.AddressBuilder
+        ("Busan","Seo-Gu","05008")
+        .build();
+System.out.println(addressA == addressB);
+
+member1.setHomeAddress(address1);
+
+~~~
+
+![JPA25](../99.Img/JPA25.png)
+
+~~~java
+// 아래 어노테이션을 사용해서 Equals 를 오버라이드하여 사용해야 한다.
+@EqualsAndHashCode
+public final class Address
+~~~
+
+## 8.5 값 타입 컬렉션
+
+![JPA26](../99.Img/JPA26.png)
+
+![JPA27](../99.Img/JPA27.png)
+
+
+* 값 타입 컬렉션들은 모두 지연 로딩이다.
+* 또한 영속성 전이(CASCADE.ALL), 고아 객체 제거 기능(orphanRemoval = true)
+
+> 컬렉션만 변경되도 실제 DB 데이터가 변경된다.
+
+![JPA28](../99.Img/JPA28.png)
+
+> 값 타입 컬렉션의 값을 변경하면 DB에는 테이블에 포함된 데이터를 다 지운다.(몇개가 됐든지) 그리고 최종적으로 남은 컬렉션 데이터를 다시 Insert 한다.
+
+> 따라서 값 타입 컬렉션은 사용하면 안된다!!!! Id가 있는것이 아니기 때문에 값 변경 추적도 힘들다...
+
+> 값타입 테이블에 참조키가 생기는 순간부터 값 타입이라고 하기 힘들다...
+
+> 따라서 실무에서는 값 타입 컬렉션 대신 일대다 관계를 쓰는 것이 낫다..
+
+* 실무에서는 값 타입 컬렉션 대신 일대다 관계로 매핑
+~~~java
+@Getter
+@Table(schema = "`JPATEST`")
+@Entity
+public class AddressEntity {
+    @Id
+    @Column(name = "address_entity_id")
+    @GeneratedValue
+    private Long id;
+
+    private Address address;
+
+    public AddressEntity() {
+    }
+
+    public AddressEntity(String city, String street, String zipcode) {
+        this.address = new Address.AddressBuilder(city,street,zipcode).build();
+    }
+}}
+
+@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+@JoinColumn(name = "member_id")
+private List<AddressEntity> newAddressHistory = new ArrayList<>();
+
+// client
+member.getNewAddressHistory().add(new AddressEntity("Seoul_old1","Dondaemun-Gu","02908"));
+~~~
+
+> 그럼 언제 쓰나? 단순한 값을 멀티 체크 할 때...정도? 그냥 쓰지마라.
+
+* 정리
+  * 값 타입은 정말 값 타입이라 판단될 때만 사용
+  * 엔티티와 값 타입을 혼동해서 엔티티를 값 타입으로 만들면 안됨
+  * 식별자가 필요하고, 지속해서 값을 추적, 변경해야 한다면 그것은 값 타입이 아닌 엔티티
+
+
+![JPA29](../99.Img/JPA29.png)
+
+## 8.6 값 타입 실전 예제
+
+![JPA30](../99.Img/JPA30.png)
+
+
+
+
+
+
+
 # 책 추천
 
 1. 객체 지향의 사실과 오해
 2. 오브젝트
-
-
