@@ -296,6 +296,17 @@ git flow release finish <branch name>
 ![gitflow9](./1.java/99.Img/Gitflow9.png)
 
 
+# 10. Gitlab SSH 생성
+
+### 1. SSH 공개키 만들기
+~~~
+$ cd ~/.ssh
+$ ssh-keygen
+// 사용 계정 등록
+~~~
+
+
+
 # git error solution
 
 ### 1. git 연관성 오류

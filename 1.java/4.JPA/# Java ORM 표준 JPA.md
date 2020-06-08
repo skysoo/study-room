@@ -786,7 +786,7 @@ Address address = new Address.AddressBuilder
 ![JPA23](../99.Img/JPA23.png)
 
 ~~~java
-// 깂을 통으로 갈아 끼워라.
+// 값을 통으로 갈아 끼워라.
 Address address1 = new Address("Seoul",address.getStreet(),address.getZipcode());
 member1.setHomeAddress(address1);
 ~~~
@@ -890,7 +890,116 @@ member.getNewAddressHistory().add(new AddressEntity("Seoul_old1","Dondaemun-Gu",
 
 
 
+# 9. JPQL1
 
+## 9.1
+JPA는 다양한 쿼리 방법을 지원
+
+1. JPQL
+2. JPA Criteria
+3. QueryDSL
+4. 네이티브 SQL - 데이터베이스에 종속적인 쿼리가 나가야 되는 경우 사용
+5. JDBC API 직접 사용, MyBatis, SpringJDBCTemplate 함께 사용
+
+> 대부분은 JPQL로 해결이 가능하다.
+
+## 9.2 JPQL
+
+1. JPA를 사용하면 엔티티 객체를 중심으로 개발
+2. 검색 쿼리- 테이블이 아닌 엔티티 객체를 대상으로 검색
+3. 모든 DB 데이터를 객체로 변환해서 검색하는 것은 불가능
+4. 어플리케이션이 필요한 데이터만 DB에서 불러오려면 결국 검색 조건이 포함된 SQL이 필요
+
+## 9.3 Criteria
+JAVA 표준 스펙
+
+1. JPQL은 동적 쿼리를 만들기가 어렵다.
+   =>  NULL 처리, 조건문 처리, 문자열 더하기 등등
+
+2. 쿼리를 컴파일 시점에 오류를 잡아준다.
+3. 하지만 SQL 관점에서는 객체 지향스럽지 않다.
+
+~~~java
+CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+CriteriaQuery<Member> query = cb.createQuery(Member.class);
+
+Root<Member> m = query.from(Member.class);
+
+CriteriaQuery<Member> cq = query.select(m).where(cb.equal(m.get("username"), "kim"));
+List<Member> resultList = entityManager.createQuery(cq)
+        .getResultList();
+~~~
+
+> 실무에서는 굳이 쓸 필요 없다. - 대신에 QueryDSL 사용해라.
+
+## 9.4 QueryDSL
+오픈 소스이다.
+
+1. 초기 셋팅이 조금 귀찮지만 해놓으면 쿼리 실수 같은 것들을 컴파일단에서 잘 잡아준다.
+2. 또한 동적 쿼리 작성이 용이하다.
+
+> 실무 사용 권장 - 레퍼런스 http://www.querydsl.com/static/querydsl/4.0.1/reference/ko-KR/html_single/
+
+
+## 9.5 네이티브 SQL
+JPQL로 해결하는 없는 특정 DB에 의존적인 기능
+
+~~~java
+entityManager.createNativeQuery("select * from MEMBER"
+~~~
+
+> 진짜 생쿼리를 넣는다. -> 컨텍스트 영속성을 관리하지 않기 때문에 flush()를 수동으로 해줘야 한다.
+
+
+# 10. JPQL 기본 문법
+
+1. JPQL은 테이블이 아닌 엔티티 객체를 대상으로 동작한다.
+2. JPQL은 결국 SQL로 변환하여 실행된다.
+
+![JPQL1](../99.Img/JPQL1.png)
+
+~~~java
+// Type 정보를 알 수 있을 때
+TypedQuery<Member> query = entityManager
+                    .createQuery("select m from Member m",Member.class);
+
+List<Member> resultList = query.getResultList();
+
+resultList.forEach(i-> System.out.println(i.getUsername()));
+
+
+// Type 정보를 받을 수 없을 때
+Query query = entityManager
+                    .createQuery("select m.username, m.age from Member m");
+
+List<Member> resultList = query.getResultList();
+
+resultList.forEach(i-> System.out.println(i.getUsername()));
+~~~
+
+## 10.1 getResultList()
+
+1. 반드시 결과 값이 하나여야 한다.
+   1. 결과 값이 없거나
+   2. 결과 값이 두개 이상이라면 무조건 Exception 발생한다... 굉장히 별로다.
+
+## 10.2 파라미터 바인딩
+
+1. 이름 기준
+~~~java
+// chining
+TypedQuery<Member> query = entityManager
+                    .createQuery("select m from Member m where m.username=:username",Member.class)
+                    .setParameter("username","PSS");
+
+
+~~~
+
+1. 위치 기준
+
+> 위치 기반 바인딩은 쓰지마라.
+
+# 11. 프로젝션
 
 
 
