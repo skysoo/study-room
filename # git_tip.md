@@ -47,6 +47,17 @@ git push -u origin master(기존 브랜치)
 git pull origin master<브랜치>
 ~~~
 
+### 1.9 원격지 파일 삭제
+~~~
+git rm -r --cached logs // 폴더면 -r 옵션 추가
+
+git add .
+
+git commit -m ""
+
+git push origin master
+~~~
+
 ### 참조. Git Status
 
 ![GitStatus](./1.java/99.Img/GitStatus.png)
