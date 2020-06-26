@@ -307,7 +307,41 @@ git flow release finish <branch name>
 ![gitflow9](./1.java/99.Img/Gitflow9.png)
 
 
-# 10. Gitlab SSH 생성
+# 10. git 프로젝트 관리
+
+### 10.1 git project fork
+
+### 10.2 git project clone
+
+### 10.3 git code 수정 및 개발
+
+### 10.4. 개발 사항 내 로컬 및 원격지의 fork와 원본 모두 적용하기
+~~~py
+# 원본 원격지 remote 등록
+git remote add upstream http://192.168.10.8/dt/sepas-gw-dummy.git
+
+# 원본 원격지 코드 받을 브랜치 생성
+git checkout -b upstream
+
+# 원본 원격지 코드 fetch
+git fetch
+
+# 원본 원격지 코드 pull
+git pull upstream develop
+
+# merge할 로컬 브랜치로 이동
+git checkout develop
+
+# 원본 원격지에서 받은 코드를 내 로컬 브랜치로 merge
+git merge upstream
+
+# 충돌 나는 부분없다면 내 로컬 브랜치를 원격지 브랜치로 push
+git push origin develop
+
+# 원격지 fork 브랜치에서 원본 원격지로 merge request 요청
+~~~
+
+# 11. Gitlab SSH 생성
 
 ### 1. SSH 공개키 만들기
 ~~~
@@ -315,7 +349,6 @@ $ cd ~/.ssh
 $ ssh-keygen
 // 사용 계정 등록
 ~~~
-
 
 
 # git error solution
