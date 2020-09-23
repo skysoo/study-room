@@ -201,7 +201,7 @@ exeuctorService.shutdown();
 * WorkStealingPool
   * ExecutorService의 WorkStealingPool은 ForkJoinPool의 Recursive~ 를 직접 구현하지 않고도 ForkJoinPool을 사용할 수 있게 해준다.
 ~~~java
-ExecutorService exeuctorService = new WorkStealingPool(n);
+ExecutorService exeuctorService = Executors.newWorkStealingPool(n));
 
 Future<T> task = executorService.submit(()->{
   T t = null;

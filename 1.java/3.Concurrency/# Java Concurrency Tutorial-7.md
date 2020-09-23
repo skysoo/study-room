@@ -59,9 +59,12 @@ List<BigInteger> aSecondOfPrimes() throws InterruptedException {
 }
 ~~~
 
-> 작업을 쉽게 취소하려면 어떻게, 언제, 어떤 일을 해야 하는지에 대한 취소 정책을 명확이 정의해야 한다.
+> 작업을 쉽게 취소하려면 어떻게, 언제, 어떤 일을 해야 하는지에 대한 취소 정책을 명확히 정의해야 한다.
 
 ### Listing 7.3 프로듀서가 대기 중인 상태로 계속 멈춰 있을 가능성이 있는 안전하지 않은 취소 방법의 예, 이런 코드는 금물!
+
+큐에 작업을 넣는 put() 이 소비하는 take() 보다 빠를 때, 큐가 가득찬 경우 put()은 블락될 것이다. 이 때, cancle()을 호출한다면 cancelled 값이 true로 매핑은 되겠지만 프로듀서는 put() 에 멈춰있고, Put()을 풀어줄 컨슈머가 더이상 작업하지 못하므로 canclled 값을 확인할 수 없다.
+
 ~~~java
 class BrokenPrimeProducer extends Thread {
   private final BlockingQueue<BigInteger> queue;
@@ -134,6 +137,10 @@ class PrimeProducer extends Thread {
   }
 }
 ~~~
+
+* 인터럽트 상태를 확인하는 부분 2가지
+  1. 큐의 Put() 메서드를 호출하는 부분
+  2. 인터럽트 상태를 직접 확인하는 반복문의 조건 확인 부분
 
 > 작업 취소 기능을 구현하고자 할 때는 인터럽트가 가장 적절한 방법이다.
 
@@ -300,7 +307,7 @@ public class ReaderThread extends Thread {
 }
 ~~~
 
-### Listing 7.12 newTaskFor를 사용해 표준을 따르지 않은 작업 중단 방법 적용
+### Listing 7.12 newTaskFor를 사용해 비표준적인 작업 중단 방법 적용
 ~~~java
 public interface CancellableTask<T> extends Callable<T> {
   void cancel();
@@ -308,7 +315,15 @@ public interface CancellableTask<T> extends Callable<T> {
   RunnableFuture<T> newTask();
 }
 
-@ThreadSafe public class CancellingExecutor extends ThreadPoolExecutor {     ...     protected<T> RunnableFuture<T> newTaskFor(Callable<T> callable) {         if (callable instanceof CancellableTask)             return ((CancellableTask<T>) callable).newTask();         else             return super.newTaskFor(callable);     } }
+@ThreadSafe public class CancellingExecutor extends ThreadPoolExecutor {
+  ...
+  protected<T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
+    if (callable instanceof CancellableTask)
+       return ((CancellableTask<T>) callable).newTask();
+    else
+      return super.newTaskFor(callable);
+    }
+}
 
 public abstract class SocketUsingTask<T> implements CancellableTask<T> {
   @GuardedBy("this")
@@ -328,14 +343,14 @@ public abstract class SocketUsingTask<T> implements CancellableTask<T> {
 
   public RunnableFuture<T> newTask() {
     return new FutureTask<T>(this) {
-      public boolean cancel(boolean mayInterruptIfRunning) {
-        try {
-          SocketUsingTask.this.cancel();
-        } finally {
-          return super.cancel(mayInterruptIfRunning);
-        }
-      }
-    };
+                    public boolean cancel(boolean mayInterruptIfRunning) {
+                      try {
+                        SocketUsingTask.this.cancel();
+                      } finally {
+                        return super.cancel(mayInterruptIfRunning);
+                      }
+                    }
+                };
   }
 }
 ~~~
