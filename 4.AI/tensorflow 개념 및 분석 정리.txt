@@ -1,0 +1,472 @@
+TensorFlow 프로그램은 보통 graph를 조립하는 '구성 단계(construction phase)'와 session을 이용해 graph의 op을 실행시키는 '실행 단계(execution phase)'로 구성됩니다.
+예를 들어 뉴럴 네트워크를 표현하고 학습시키기 위해 구성 단계에는 graph를 만들고 실행 단계에는 graph의 훈련용 작업들(set of training ops)을 반복해서 실행합니다.
+
+연산에 쓰인 시스템 자원을 돌려보내려면 session을 닫아야 합니다. 시스템 자원을 더 쉽게 관리하려면 with 구문을 쓰면 됩니다. 각 Session에 컨텍스트 매니저(
+역자 주: 파이썬의 요소 중 하나로 주로 'with' 구문에서 쓰임)가 있어서 'with' 구문 블락의 끝에서 자동으로 'close()'가 호출됩니다.
+
+data.shape (4,)
+data[0].shape (12090, 48, 64, 3) - 학습 데이터
+data[1].shape (3023, 48, 64, 3) - 테스트 데이터
+data[2].shape (12090, 5) - 학습 라벨
+data[3].shape (3023, 5) - 테스트 라벨
+
+array([[[[0.55294118, 0.36862745, 0.20392157],
+         [0.55686275, 0.41960784, 0.18039216],
+         [0.55294118, 0.4       , 0.19215686],
+         ...,
+         [0.55686275, 0.43921569, 0.17647059],
+         [0.55686275, 0.44313725, 0.17254902],
+         [0.55686275, 0.42352941, 0.18039216]],
+
+        [[0.55686275, 0.42745098, 0.18039216],
+         [0.55686275, 0.42745098, 0.18039216],
+         [0.54509804, 0.34117647, 0.21960784],
+         ...,
+		 
+		 
+		 
+		 
+* tf.layers.conv2d(
+    inputs,		
+    filters,
+    kernel_size,
+    strides=(1, 1),
+    padding='valid',
+    data_format='channels_last',
+    dilation_rate=(1, 1),
+    activation=None,
+    use_bias=True,
+    kernel_initializer=None,
+    bias_initializer=<tensorflow.python.ops.init_ops.Zeros object at 0x7f4731bfb9b0>,
+    kernel_regularizer=None,
+    bias_regularizer=None,
+    activity_regularizer=None,
+    kernel_constraint=None,
+    bias_constraint=None,
+    trainable=True,
+    name=None,
+    reuse=None,
+)
+
+
+- inputs : 텐서 입력. 
+- filters : 정수, 출력 공간의 차원 (즉, 컨볼루션의 필터 수). 
+- kernel_size : 2D 컨볼 루션 창의 높이와 너비를 지정하는 정수 또는 튜플 / 2 개의 정수 목록입니다. 모든 공간 치수에 대해 동일한 값을 지정하는 단일 정수일 수 있습니다. 
+- strides : 높이와 너비를 따라 회선의 보폭을 지정하는 정수 또는 튜플 / 2 개의 정수 목록입니다. 모든 공간 치수에 대해 동일한 값을 지정하는 단일 정수일 수 있습니다. 
+ 	보폭 값! = 1을 지정하면`dilation_rate` 값! = 1을 지정하는 것과 호환되지 않습니다. 
+- padding : ""valid "`또는" "same"`중 하나 (대소 문자 구분). 
+- data_format :`channels_last` (기본값) 또는`channels_first` 중 하나 인 문자열입니다. 입력에서 치수의 순서입니다. 
+ 	`channels_last`는`(일괄 처리, 높이, 너비, 채널) 모양의 입력에 해당하고`channels_first`는`(일괄 처리, 채널, 높이, 너비) 모양의 입력에 해당합니다. 
+- dilation_rate : 정수 또는 확장 된 회선에 사용할 확장 속도를 지정하는 2 개의 정수로 구성된 튜플 / 목록. 모든 공간 치수에 대해 동일한 값을 지정하는 단일 정수일 수 있습니다. 
+ 	현재,`dilation_rate` 값! = 1을 지정하는 것은 모든 보폭 값! = 1을 지정하는 것과 호환되지 않습니다. 
+- activation=None 선형 활성화를 유지하려면 없음으로 설정하십시오. 
+- use_bias : 레이어가 바이어스를 사용하는지 여부를 나타내는 부울입니다. 
+- kernel_initializer : 컨볼 루션 커널의 이니셜 라이저. 
+- bias_initializer : 바이어스 벡터의 이니셜 라이저. None이면 기본 이니셜 라이저가 사용됩니다. 
+- kernel_regularizer : 컨볼 루션 커널을위한 선택적 정규화 기. 
+- bias_regularizer : 바이어스 벡터에 대한 선택적 정규화 기입니다. 
+- activity_regularizer : 출력을위한 선택적 정규화 기능. 
+- kernel_constraint : 옵티 마이저 (Optimizer)에 의해 업데이트 된 후 커널에 적용될 선택적 프로젝션 함수 (예 : 레이어 가중치에 대한 표준 제약 또는 값 제약을 구현하는 데 사용). 
+	이 기능은 입력으로 사용해야합니다 투영되지 않은 변수이며 투영 된 변수를 반환해야합니다 (같은 모양이어야 함). 
+	비동기식 분산 교육을 수행 할 때 제약 조건을 사용하는 것이 안전하지 않습니다. 
+- bias_constraint : 옵티 마이저에 의해 업데이트 된 후 바이어스에 적용될 선택적 프로젝션 함수. 
+- trainable : True, 그래프 컬렉션에 변수를 추가하는 경우 부울 (GraphKeys.TRAINABLE_VARIABLES) ( 'tf.Variable'참조) 
+- name : 레이어 이름 인 문자열. 재사용 : 부울, 동일한 이름으로 이전 레이어의 가중치를 재사용할지 여부.
+
+
+conv11 = tf.layers.conv2d(
+    inputs=x,
+    filters=32,
+    kernel_size=[5,5],
+    padding="same",
+    activation=tf.nn.relu)
+	
+	x 텐서를 받아서 32개의 출력을 갖고 kerner 사이즈는 5,5에 padding은 same으로 두어서 입력과 출력의 크기를 같게 한다
+	relu 함수를 사용하겠다.
+	
+
+* tf.layers.max_pooling2d(
+    inputs,
+    pool_size,
+    strides,
+    padding='valid',
+    data_format='channels_last',
+    name=None,
+)
+
+- inputs : 풀링 할 텐서. 
+- pool_size : 풀링 창의 크기를 지정하는 정수 또는 튜플 / 2 개의 정수 목록 (pool_height, pool_width)입니다. 
+ 	모든 공간 치수에 대해 동일한 값을 지정하는 단일 정수일 수 있습니다. 
+- strides : 풀링 작업의 보폭을 지정하는 정수 또는 튜플 / 2 개의 정수 목록입니다. 
+ 	모든 공간 치수에 대해 동일한 값을 지정하는 단일 정수일 수 있습니다. 
+- padding : 문자열. 패딩 방법 ( '유효'또는 '동일') 대소 문자를 구분하지 않습니다. 
+- data_format : 문자열. 입력에서 치수의 순서입니다. `channels_last` (기본값) 및`channels_first`가 지원됩니다. 
+	channels_last`는`(일괄 처리, 높이, 너비, 채널) 모양의 입력에 해당하고`channels_first`는`(일괄 처리, 채널, 높이, 너비) 모양의 입력에 해당합니다. 
+- name : 레이어 이름 인 문자열.
+
+
+pool1 = tf.layers.max_pooling2d(
+    inputs = conv12,
+    pool_size = [2,2],
+    strides = 2)
+	
+	입력값으로 conv12 텐서를 받고 pool 사이즈를 2,2 보폭을 2로 지정한다.
+
+
+* tf.reshape(tensor, shape, name=None)
+ `tensor`가 주어지면,이 연산은 같은 값을 가진 텐서를 반환합니다 모양이 모양 인 텐서로 사용됩니다. 
+ `shape`의 한 구성 요소가 특수 값 -1이면 해당 치수의 크기 전체 크기가 일정하게 유지되도록 계산됩니다. 
+ 특히 '모양' '[-1]`의 1-D로 평평해진다. `shape`의 최대 하나의 구성 요소는 -1 일 수 있습니다. `shape`가 1-D 이상이면 연산은 모양이있는 텐서를 반환합니다. 
+ `shape`는`tensor`의 값으로 채워져 있습니다. 이 경우 요소 수 `shape`에 의해 암시 된 것은`tensor`의 요소 수와 같아야합니다.
+ 
+pool_flat = tf.reshape(pool2,[-1,input_cnt])
+
+	pool2 텐서를 받고, 모양을 재조정하는데 이 때, input_cnt 단위로 평면화 한다.
+	
+* tf.layers.dense(
+    inputs,
+    units,
+    activation=None,
+    use_bias=True,
+    kernel_initializer=None,
+    bias_initializer=<tensorflow.python.ops.init_ops.Zeros object at 0x7f4731bfb400>,
+    kernel_regularizer=None,
+    bias_regularizer=None,
+    activity_regularizer=None,
+    kernel_constraint=None,
+    bias_constraint=None,
+    trainable=True,
+    name=None,
+    reuse=None,
+)
+
+이 계층은 다음 작업을 구현합니다. `outputs = activation (inputs * kernel + bias)` 여기서 'activation'는 'activation'로 전달 된 activation 함수입니다. 
+인수 (`None`이 아닌 경우),`kernel`은 레이어에 의해 생성 된 가중치 행렬입니다. 'bias'는 레이어에 의해 생성 된 bias 벡터입니다 
+
+- inputs : 텐서 입력. 
+- units : 정수 또는 Long, 출력 공간의 차원. 
+- activation : 활성화 기능 (호출 가능). 선형 활성화를 유지하려면 없음으로 설정하십시오. 
+- use_bias : 레이어가 바이어스를 사용하는지 여부를 나타내는 부울입니다. 
+- kernel_initializer : 가중치 매트릭스의 초기화 기능. `None` (기본값)이면 가중치는`tf.get_variable`에서 사용하는 기본 이니셜 라이저를 사용하여 초기화됩니다. 
+- bias_initializer : 바이어스의 초기화 기능. 
+- kernel_regularizer : 가중치 매트릭스를위한 정규화 기능. 
+- bias_regularizer : 바이어스에 대한 정규화 기능. 
+- activity_regularizer : 출력을위한 정규화 기능. 
+- kernel_constraint : 옵티 마이저 (Optimizer)에 의해 업데이트 된 후 커널에 적용될 선택적 프로젝션 함수 이 함수는 프로젝션되지 않은 변수를 	
+ 	입력으로 가져 와서 프로젝션 된 변수 (같은 모양을 가져야 함)를 반환해야합니다. 제약 조건은 사용하기에 안전하지 않습니다 비동기식 분산 훈련. 
+- bias_constraint : 옵티 마이저에 의해 업데이트 된 후 바이어스에 적용될 선택적 프로젝션 함수. 
+- trainable : True, 그래프 컬렉션에 변수를 추가하는 경우 부울 (GraphKeys.TRAINABLE_VARIABLES) ( 'tf.Variable'참조) 
+- name : 문자열, 레이어 이름. 
+- reuse : 부울, 동일한 이름으로 이전 레이어의 가중치를 재사용할지 여부.
+
+
+* tf.layers.dropout(
+    inputs,
+    rate=0.5,
+    noise_shape=None,
+    seed=None,
+    training=False,
+    name=None,
+)
+입력에 드롭 아웃을 적용합니다.
+드롭 아웃은 입력 단위의 분수`율 '을 임의로 0으로 설정합니다. 훈련 시간 동안 업데이트 할 때마다 과적 합을 방지하는 데 도움이됩니다. 
+유지되는 단위는`1 / (1-rate)`로 조정되므로 훈련 시간과 추론 시간에는 합계가 변경되지 않습니다.
+
+
+입력 : 텐서 입력. 
+- rate : 0과 1 사이의 드롭 아웃 비율입니다. "rate = 0.1"은 입력 단위의 10 %를 제거합니다. 
+- noise_shape : 입력과 곱해지는 이진 드롭 아웃 마스크의 모양을 나타내는 'int32'유형의 1D 텐서. 예를 들어, 
+			입력의 모양이`(batch_size, timesteps, features)`이고 드롭 아웃 마스크가 모든 시간 간격에 대해 
+			동일하도록하려면`noise_shape = [batch_size, 1, features]`를 사용할 수 있습니다. 
+- seed : 파이썬 정수. 임의의 씨앗을 만드는 데 사용됩니다. 동작에 대해서는`tf.set_random_seed`를 참조하십시오. 
+- training : 파이썬 부울 또는 TensorFlow 부울 스칼라 텐서 (예 : placeholder). 훈련 모드 training mode (dropout) 또는 
+			추론 모드inference mode (return the input untouche)에서 출력을 반환할지 여부. 
+- name : 레이어 이름 (문자열).
+
+
+dropout1 = tf.layers.dropout(
+    inputs=dense1,
+    rate = 0.4,
+    training=use_dropout)
+
+* tf.square(x, name=None)
+x의 제곱을 요소 단위로 계산합니다.
+
+x :`텐서`. `bfloat16`,`half`,`float32`,`float64`,`int32`,`int64`,`complex64`,`complex128` 중 하나 여야합니다. 
+name : 작업 이름 (선택 사항).
+
+
+
+* tf.reduce_sum(
+    input_tensor,
+    axis=None,
+    keepdims=None,
+    name=None,
+    reduction_indices=None,
+    keep_dims=None,
+)
+텐서의 차원에서 요소의 합을 계산합니다.
+
+`axis`에 주어진 치수를 따라`input_tensor`를 줄입니다. 'keepdims'가 false이면, 텐서의 순위는 각각 1 씩 감소합니다 
+'keepdims'가 true이면 축소 된 크기 길이 1로 유지됩니다. `axis`가 None이면 모든 치수가 줄어들고 a 단일 요소를 가진 텐서가 반환됩니다.
+
+```python
+x = tf.constant([[1, 1, 1], [1, 1, 1]])
+tf.reduce_sum(x)  # 6
+tf.reduce_sum(x, 0)  # [2, 2, 2]
+tf.reduce_sum(x, 1)  # [3, 3]
+tf.reduce_sum(x, 1, keepdims=True)  # [[3], [3]]
+tf.reduce_sum(x, [0, 1])  # 6
+```
+
+* tf.reduce_mean(
+    input_tensor,
+    axis=None,
+    keepdims=None,
+    name=None,
+    reduction_indices=None,
+    keep_dims=None,
+)
+
+텐서의 차원에서 요소의 평균을 계산합니다.
+
+`axis`에 주어진 치수를 따라`input_tensor`를 줄입니다. 'keepdims'가 참이 아닌 한, 텐서의 순위는 각각 1 씩 감소합니다
+'keepdims'가 true이면 축소 된 크기 길이 1로 유지됩니다. `axis`가 None이면 모든 치수가 줄어들고 a 단일 요소를 가진 텐서가 반환됩니다.
+
+```python
+x = tf.constant([[1., 1.], [2., 2.]])
+tf.reduce_mean(x)  # 1.5
+tf.reduce_mean(x, 0)  # [1.5, 1.5]
+tf.reduce_mean(x, 1)  # [1.,  2.]
+```
+
+np.mean에는`dtype` 매개 변수가있어 출력 유형을 지정하십시오. 디폴트는`dtype = float64`입니다. 
+다른 한편 tf.reduce_mean은`input_tensor`에서 공격적인 타입 추론을 가지고 있습니다.
+
+```python
+x = tf.constant([1, 0, 1, 0])
+tf.reduce_mean(x)  # 0
+y = tf.constant([1., 0., 1., 0.])
+tf.reduce_mean(y)  # 0.5
+```
+
+* tf.summary.scalar(name, tensor, collections=None, family=None)
+
+단일 스칼라 값을 포함하는`요약`프로토콜 버퍼를 출력합니다. 생성 된 요약에는 입력 Tensor를 포함하는 Tensor.proto가 있습니다.
+
+name : 생성 된 노드의 이름입니다. TensorBoard에서 시리즈 이름으로도 사용됩니다. 
+tensor : 단일 값을 포함하는 실수 숫자 텐서. 
+collections : 그래프 콜렉션 키의 선택적 목록. 새로운 요약 op가이 컬렉션에 추가됩니다. 기본값은`[GraphKeys.SUMMARIES]`입니다. 
+family : 선택 사항; 제공된 경우 요약 태그 이름의 접 두부로 사용되며 Tensorboard에 표시하는 데 사용되는 탭 이름을 제어합니다.
+
+====================================================================
+* 분석
+
+* graph=tf.get_default_graph()
+현재 스레드의 기본 그래프를 반환합니다.
+반환 된 그래프는 가장 안쪽에있는 그래프입니다. `Graph.as_default ()`컨텍스트가 입력되었거나 전역 기본값 명시 적으로 생성되지 않은 경우 그래프.
+
+기본 그래프는 현재 스레드의 속성입니다. 만약 니가 새로운 스레드를 만들고 그 안에 기본 그래프를 사용하고싶다면 
+스레드에서 명시 적으로`with g.as_default () :`를 추가해야합니다. 스레드의 기능.
+
+
+
+* graph.get_tensor_by_name()
+placeholder 불러오기
+
+* graph.get_operation_by_name()
+operation 불러오기
+
+* range(self, /, *args, **kwargs)
+range(stop) -> range object
+range(start, stop[, step]) -> range object
+
+시작부터 정수 시퀀스를 생성하는 객체를 반환합니다 (포함). 단계적으로 (독점) 중지합니다. range (i, j)는 i, i + 1, i + 2, ..., j-1을 생성합니다.
+start는 기본적으로 0이며 stop은 생략됩니다! range (4)는 0, 1, 2, 3을 생성합니다. 4 개의 원소리스트에 대한 정확한 인덱스입니다. 단계가 제공되면 증분 (또는 감소)을 지정합니다.
+
+
+* tf.saved_model.loader.load(
+    sess,
+    tags,
+    export_dir,
+    import_scope=None,
+    **saver_kwargs,
+)
+
+태그로 지정된 SavedModel에서 모델을로드합니다
+
+향후 버전에서 제거 될 예정입니다. 업데이트 지침 : 이 기능은 v1 호환성 라이브러리를 통해서만 tf.compat.v1.saved_model.loader.load 
+또는 tf.compat.v1.saved_model.load로 사용할 수 있습니다. 
+Tensorflow 2.0에서 저장된 모델을 가져 오기위한 새로운 기능이 있습니다.
+
+- sess : 변수를 복원하기위한 TensorFlow 세션. 
+- tags : 필요한 MetaGraphDef를 식별하기위한 문자열 태그 세트. 
+- SavedModel`save ()`API를 사용하여 변수를 저장할 때 사용되는 태그와 일치해야합니다. 
+- export_dir : 저장된 모델 프로토콜 버퍼 및 로드 할 변수가있는 디렉토리. 
+- import_scope : 선택적`string`-지정된 경우,이 문자열 다음에 '/'를로드 된 모든 텐서 이름 앞에 붙입니다. 
+ 		이 범위는 전달 된 세션에로드 된 텐서 인스턴스에 적용되지만 반환되는 정적 'MetaGraphDef'프로토콜 버퍼에는 * 쓰지 않습니다 *. ** 
+- saver_kwargs : 선택적 키워드 인수가 Saver로 전달되었습니다.
+
+
+* sess.run(fetches, feed_dict=None, options=None, run_metadata=None)
+작업을 실행하고`fetches '에서 텐서를 평가합니다.
+
+이 방법은 TensorFlow 계산의 한 "단계"를 실행합니다. 모든 '작업'을 실행하는 데 필요한 그래프 조각 실행 
+그리고 'fetches'의 모든`Tensor`를 평가하여 해당 입력 값에 대한`feed_dict`.
+
+`run ()`에 의해 반환 된 값은 'fetches'인수와 모양이 동일합니다. 여기서 텐서 플로우에 의해 반환 된 해당 값으로 대체됩니다. 
+
+```python
+   a = tf.constant([10, 20])
+   b = tf.constant([1.0, 2.0])
+   # 'fetches' can be a singleton
+   v = session.run(a)
+   # v is the numpy array [10, 20]
+   # 'fetches' can be a list.
+   v = session.run([a, b])
+   # v is a Python list with 2 numpy arrays: the 1-D array [10, 20] and the
+   # 1-D array [1.0, 2.0]
+   # 'fetches' can be arbitrary lists, tuples, namedtuple, dicts:
+   MyData = collections.namedtuple('MyData', ['a', 'b'])
+   v = session.run({'k1': MyData(a, b), 'k2': [b, a]})
+   # v is a dict with
+   # v['k1'] is a MyData namedtuple with 'a' (the numpy array [10, 20]) and
+   # 'b' (the numpy array [1.0, 2.0])
+   # v['k2'] is a list with the numpy array [1.0, 2.0] and the numpy array
+   # [10, 20].
+```
+
+'feed_dict'의 각 값은 dtype의 numpy 배열로 변환 가능해야합니다.
+
+fetches : 단일 그래프 요소, 그래프 요소 목록 또는 값이 그래프 요소 또는 그래프 요소 목록 인 사전 (위 설명) 
+feed_dict : 그래프 요소를 값에 매핑하는 사전입니다 (위 설명 참조). 
+options : A [`RunOptions`] 프로토콜 버퍼 
+run_metadata : [`RunMetadata`] 프로토콜 버퍼
+
+반환 값 : 'fetches'가 단일 그래프 요소 인 경우 단일 값이거나, 'fetches'가 목록 인 경우 값 목록이거나, 
+사전 인 경우 'fetches'와 동일한 키가있는 사전입니다 (위 설명 참조). 호출 내에서 '페치'연산이 평가되는 순서는 정의되어 있지 않습니다.
+
+
+=> _out=sess.run([out],feed_dict={x:test_x,use_dropout:False})
+	_out 값은 tensorflow에 의해 반환된 값
+	[out] graph의 각 변수는 feed_dict의 값 사용한다. 즉, x는 test_x, use_dropout은 false
+	test_x는 data[0][:3000] 학습 데이터
+
+
+* np.argmax(a, axis=None, out=None)
+축을 따라 최대 값의 인덱스를 반환합니다.
+=> axis에 해당하는 값들 중 가장 큰 값의 인덱스들을 반환하는 함수
+
+a : array_like 입력 배열. 
+axis : int, 선택 사항 기본적으로 인덱스는 병합 된 배열에 있으며, 그렇지 않으면 지정된 축을 따릅니다. 
+out : array, optional 제공된 경우 결과가이 배열에 삽입됩니다. 적절한 모양과 dtype이어야합니다.
+
+=> xyz(3,4,3)
+
+1	2	3
+2	1	4
+5	2	1
+6	3	2
+
+5	1	3
+1	3	4
+4	2	6
+3	9	3
+
+4	5	6
+7	4	3
+2	1	5
+4	3	1
+
+np.argmax(a,axis=0) , x축을 기준으로
+
+1,5,4	2,1,5	3,3,6		1	2	2		
+2,1,7	1,3,4	4,4,3	=>	2	2	0		
+5,4,2	2,2,1	1,6,5	=>	0	0	1
+6,3,4	3,9,3	2,3,1		0	1	1
+
+np.argmax(a,axis=1) , y축을 기준으로
+
+1,2,5,6		2,1,2,3		3,4,1,2		3	3	1	
+5,1,4,3		1,3,2,9		3,4,6,3	=>	0	3	2
+4,7,2,4		5,4,1,3		6,3,5,1		1	0	0
+
+
+	predict = np.argmax(_out[index],axis=0)
+    label = np.argmax(test_y[index], axis=0)
+	=> _out[] 배열 값 중 x축을 기준으로 가장 큰 값의 인덱스를 반환
+
+* plt.figure(
+    num=None,
+    figsize=None,
+    dpi=None,
+    facecolor=None,
+    edgecolor=None,
+    frameon=True,
+    FigureClass=<class 'matplotlib.figure.Figure'>,
+    clear=False,
+    **kwargs,
+)
+
+num : 정수 또는 문자열, 선택 사항, 기본값 : 없음 제공하지 않으면 새 Figure가 만들어지고 Figure 번호가 증가합니다. 
+		Figure 객체는이 숫자를`number` 속성으로 보유합니다. num이 제공되고이 ID를 가진 그림이 이미 존재하면 활성화하고 참조를 리턴합니다. 
+		이 그림이 존재하지 않으면 작성하여 리턴하십시오. num이 문자열 인 경우, 창 제목은이 그림의`num`으로 설정됩니다. 
+figsize : (float, float), 선택 사항, 기본값 : 너비, 높이 (인치). 제공하지 않으면 기본값은 : rc :`figure.figsize` =``[6.4, 4.8]``입니다. 
+dpi : 정수, 선택적, 기본값 : 그림의 해상도 없음. 제공하지 않으면 기본값은 : rc :`figure.dpi` =``100 ''입니다. 
+facecolor : 배경색입니다. 제공하지 않으면 기본값은 : rc :`figure.facecolor` =`` 'w'``입니다. 
+edgecolor : 테두리 색입니다. 제공하지 않으면 기본값은 : rc :`figure.edgecolor` =`` 'w'``입니다. 
+frameon : bool, 선택적, 기본값 : True False이면 그림 프레임 그리기를 억제합니다. 
+FigureClass : ~ matplotlib.figure.Figure의 서브 클래스 선택적으로 커스텀`.Figure` 인스턴스를 사용합니다. 
+clear : bool, 선택적, 기본값 : False True이고 그림이 이미 존재하면 지워집니다.
+
+- return 반환 된`.Figure` 인스턴스는 백엔드의 new_figure_manager로 전달되어 사용자 정의`.Figure` 
+클래스를 pyplot 인터페이스에 연결할 수 있습니다. 추가적인 kwargs는`.Figure` init 함수로 전달됩니다.
+
+- 많은 figure를 만드는 경우 명시 적으로 종료해야합니다. 
+: func :`.pyplot.close`는 사용하지 않는 그림에 있습니다. pyplot을 활성화하여 메모리를 올바르게 정리하십시오.
+
+
+* plt.specgram(
+    x,
+    NFFT=None,
+    Fs=None,
+    Fc=None,
+    detrend=None,
+    window=None,
+    noverlap=None,
+    cmap=None,
+    xextent=None,
+    pad_to=None,
+    sides=None,
+    scale_by_freq=None,
+    mode=None,
+    scale=None,
+    vmin=None,
+    vmax=None,
+    *,
+    data=None,
+    **kwargs,
+)
+
+* x *의 데이터 스펙트로 그램을 계산하고 플로팅합니다. 데이터는 * NFFT * 길이 세그먼트와 각 섹션의 스펙트럼은 계산되었습니다. 
+윈도우 기능 * window *가 각각에 적용됩니다 세그먼트 및 각 세그먼트의 겹치는 양은 * noverlap *로 지정되었습니다. 스펙트로 그램은 컬러 맵으로 표시됩니다 (imshow 사용).
+
+
+* plt.tight_layout(pad=1.08, h_pad=None, w_pad=None, rect=None)
+
+지정된 플롯을 제공하도록 서브 플롯 매개 변수를 자동으로 조정합니다.
+
+
+* plt.subplots_adjust(
+    left=None,
+    bottom=None,
+    right=None,
+    top=None,
+    wspace=None,
+    hspace=None,
+)
+
+서브 플롯 레이아웃을 조정하십시오.
+
+
+
