@@ -1,4 +1,4 @@
-# VS code 터미널 설정 - cmder
+# VS code 터미널 설정
 
 ## 1. Settings -> Features -> Terminal 로 이동
 
