@@ -18,6 +18,8 @@
 
 ### 1.9 Domain 클래스에서 @OneToMany는 Builder에 추가할 필요 없다.
 
+### 1.10 DTO 작성시 데이터 타입은 Wrapper 클래스를 사용하자. (null 필요할 수도 있기 때문에)
+
 - example 빌더 직접 구현
 
 ```java
